@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "week5examples",
-    "slug": "week5examples",
+    "name": "week8examples",
+    "slug": "week8examples",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,9 +24,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-router"
-    ]
+    }
   }
 }
