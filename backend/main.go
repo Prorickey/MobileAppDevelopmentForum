@@ -26,6 +26,10 @@ type LoginResponse struct {
 	Username string `json:"username"`
 }
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 var (
 	users       = make(map[string]*User)
 	nextID      = 1
@@ -42,21 +46,27 @@ func main() {
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
 }
 
+func sendError(w http.ResponseWriter, message string, statusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(ErrorResponse{Error: message})
+}
+
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		sendError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Error reading request", http.StatusBadRequest)
+		sendError(w, "Error reading request", http.StatusBadRequest)
 		return
 	}
 
 	var req LoginRequest
 	if err := json.Unmarshal(body, &req); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		sendError(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
@@ -78,7 +88,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// User exists - verify password
 		if user.Password != req.Password {
-			http.Error(w, "Invalid password", http.StatusUnauthorized)
+			sendError(w, "Invalid password", http.StatusUnauthorized)
 			return
 		}
 	}
